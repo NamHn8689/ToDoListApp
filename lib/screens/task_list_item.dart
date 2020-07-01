@@ -2,10 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:todo_list_2/bloc/task_bloc.dart';
-import 'package:todo_list_2/event/delete_task_event.dart';
-import 'package:todo_list_2/model/task.dart';
-import 'package:todo_list_2/screens/modal_screen.dart';
+
+import '../bloc/task_bloc.dart';
+import '../event/delete_task_event.dart';
+import '../model/task.dart';
+import 'modal_screen.dart';
 
 class TaskList extends StatefulWidget {
   @override
@@ -14,40 +15,35 @@ class TaskList extends StatefulWidget {
 
 class TaskListState extends State<TaskList> {
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    var bloc = Provider.of<TaskBloc>(context);
-    bloc.initData();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final bloc = Provider.of<TaskBloc>(context);
+    bloc.initData();
     return Consumer<TaskBloc>(
         builder: (context, bloc, child) => StreamBuilder<List<Task>>(
             stream: bloc.taskListStream,
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
                 case ConnectionState.active:
-                  if (snapshot.data.length == 0)
+                  if (snapshot.data.isEmpty) {
                     return Center(
                         child: Column(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: <Widget>[
                           Container(
-                              margin: EdgeInsets.only(top: 60),
+                              margin: const EdgeInsets.only(top: 60),
                               height: MediaQuery.of(context).size.height * 0.62,
                               child: Image.asset('images/waiting.png',
                                   fit: BoxFit.cover)),
-                          SizedBox(height: 35),
-                          Text(
+                          const SizedBox(height: 35),
+                          const Text(
                             'No tasks added yet...',
                             style: TextStyle(
                               fontStyle: FontStyle.italic,
-                              fontSize: 19.0,
+                              fontSize: 19,
                             ),
                           )
                         ]));
-                  else
+                  } else {
                     return Column(
                       children: <Widget>[
                         Expanded(
@@ -58,32 +54,32 @@ class TaskListState extends State<TaskList> {
                                 return Dismissible(
                                   key: Key(snapshot.data[index].id.toString()),
                                   background: Container(
-                                      alignment: AlignmentDirectional.centerEnd,
-                                      child: Padding(
-                                          padding: EdgeInsets.only(right: 15.0),
-                                          child: Icon(Icons.delete,
-                                              size: 28.0, color: Colors.white)),
-                                      color: Colors.red),
+                                    alignment: AlignmentDirectional.centerEnd,
+                                    color: Colors.red,
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(right: 15),
+                                      child: Icon(Icons.delete,
+                                          size: 28, color: Colors.white),
+                                    ),
+                                  ),
                                   direction: DismissDirection.endToStart,
                                   onDismissed: (_) {
-                                    //swipe to delete task
                                     Provider.of<TaskBloc>(context,
                                             listen: false)
                                         .event
                                         .add(DeleteTaskEvent(
                                             snapshot.data[index]));
-//                                    print("deleted");
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(boxShadow: [
                                       BoxShadow(
-                                        offset: Offset(0, 15),
+                                        offset: const Offset(0, 15),
                                         blurRadius: 30,
                                         color: Colors.black54.withOpacity(.15),
                                       )
                                     ]),
-                                    margin:
-                                        EdgeInsets.only(right: 5.0, left: 5.0),
+                                    margin: const EdgeInsets.only(
+                                        right: 5, left: 5),
                                     child: Card(
                                       child: ListTile(
                                         title: Column(
@@ -96,9 +92,10 @@ class TaskListState extends State<TaskList> {
                                               snapshot.data[index]
                                                       .description ??
                                                   "",
-                                              style: TextStyle(fontSize: 22.0),
+                                              style:
+                                                  const TextStyle(fontSize: 22),
                                             ),
-                                            SizedBox(height: 3),
+                                            const SizedBox(height: 3),
                                             Row(
                                               children: <Widget>[
                                                 Text(
@@ -110,7 +107,7 @@ class TaskListState extends State<TaskList> {
                                                           .accentColor,
                                                       fontSize: 13),
                                                 ),
-                                                SizedBox(width: 12),
+                                                const SizedBox(width: 12),
                                                 Text(
                                                   snapshot.data[index]
                                                           .dueTime ??
@@ -125,25 +122,26 @@ class TaskListState extends State<TaskList> {
                                           ],
                                         ),
                                         trailing: GestureDetector(
-                                          child: Icon(
-                                            Icons.edit,
-                                            color: Colors.black,
-                                          ),
                                           onTap: () {
-                                            var id = snapshot.data[index].id;
+                                            final id = snapshot.data[index].id;
                                             showModalBottomSheet(
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.vertical(
-                                                          top: Radius.circular(
-                                                              20))),
+                                              shape:
+                                                  const RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.vertical(
+                                                              top: Radius
+                                                                  .circular(
+                                                                      20))),
                                               context: context,
                                               builder: (_) =>
                                                   ModalScreen(id, true),
                                             );
-                                            bloc.event.add(DeleteTaskEvent(
-                                                snapshot.data[index]));
+                                            ///////////////////////////////
+//                                            bloc.event.add(DeleteTaskEvent(
+//                                                snapshot.data[index]));
                                           },
+                                          child: const Icon(Icons.edit,
+                                              color: Colors.black),
                                         ),
                                       ),
                                     ),
@@ -153,23 +151,17 @@ class TaskListState extends State<TaskList> {
                         ),
                       ],
                     );
+                  }
                   break;
                 case ConnectionState.none:
                 case ConnectionState.waiting:
                 default:
                   return Container(
-                      padding: EdgeInsets.only(top: 200.0),
-                      width: 69.0,
-                      height: 69.0,
-                      child: CircularProgressIndicator());
+                      padding: const EdgeInsets.only(top: 200),
+                      width: 69,
+                      height: 69,
+                      child: const CircularProgressIndicator());
               }
             }));
   }
-
-//  editMode() {
-//    return showModalBottomSheet(
-//      context: context,
-//      builder: (_) => ModalScreen(),
-//    );
-//  }
 }

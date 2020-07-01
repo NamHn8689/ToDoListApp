@@ -1,21 +1,21 @@
 import 'dart:async';
 
-import 'package:todo_list_2/base/base_bloc.dart';
-import 'package:todo_list_2/base/base_event.dart';
-import 'package:todo_list_2/db/task_table.dart';
-import 'package:todo_list_2/event/add_task_event.dart';
-import 'package:todo_list_2/event/delete_task_event.dart';
-import 'package:todo_list_2/event/edit_task_event.dart';
-import 'package:todo_list_2/model/task.dart';
+import '../base/base_bloc.dart';
+import '../base/base_event.dart';
+import '../db/task_table.dart';
+import '../event/add_task_event.dart';
+import '../event/delete_task_event.dart';
+import '../event/edit_task_event.dart';
+import '../model/task.dart';
 
 class TaskBloc extends BaseBloc {
   StreamController<List<Task>> _taskListStreamController = StreamController();
 
   Stream<List<Task>> get taskListStream => _taskListStreamController.stream;
 
-  TaskTable _taskTable = TaskTable();
+  final _taskTable = TaskTable();
 
-  List<Task> _list = List();
+  List<Task> _list = [];
 
   initData() async {
     _list = await _taskTable.selectAllTask();
@@ -38,7 +38,7 @@ class TaskBloc extends BaseBloc {
     _taskListStreamController.sink.add(_list);
   }
 
-  void _editTask(Task task) {
+  void _editTask(Task task) async {
     _deleteTask(task);
     _addTask(task);
   }

@@ -1,13 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:todo_list_2/base/base_event.dart';
+
+import 'base_event.dart';
 
 abstract class BaseBloc {
-  StreamController<BaseEvent> _eventStreamController = StreamController();
-
-  Sink<BaseEvent> get event => _eventStreamController.sink;
-
   BaseBloc() {
     _eventStreamController.stream.listen((event) {
       if (event is! BaseEvent) {
@@ -16,6 +13,10 @@ abstract class BaseBloc {
       dispatchEvent(event);
     });
   }
+
+  final StreamController<BaseEvent> _eventStreamController = StreamController();
+
+  Sink<BaseEvent> get event => _eventStreamController.sink;
 
   void dispatchEvent(BaseEvent event);
 
